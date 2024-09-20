@@ -1,10 +1,13 @@
 // Import required modules
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
+
 
 const db = require("./db/db"); 
 const  userController  = require('./routes/usersRoute/userController');
 const app = express();
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // For parsing application/json
 // Define a route to test the database connection
@@ -19,7 +22,7 @@ app.get("/", (req, res) => {
 });
 app.use('/users', userController);
 // Start the server
-const PORT = 3000;
+const PORT = 3010;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
