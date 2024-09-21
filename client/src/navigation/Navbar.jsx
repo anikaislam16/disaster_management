@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 const Navbar = () => {
   return (
     <div>
-      <div className="navbar bg-blue-700 fixed top-0 left-0 w-full z-50">
+      <div className="navbar bg-blue-700 ">
         {/* Navbar Start */}
         <div className="navbar-start">
           {/* Hamburger Menu for Small Screens */}
@@ -138,7 +138,7 @@ const Navbar = () => {
         <div className="navbar-end flex justify-end gap-5">
           <div>
             <NavLink
-              to="/login"
+              to="/login/volunteer"
               className={({ isActive }) =>
                 isActive ? "text-blue btn" : "text-blue btn"
               }

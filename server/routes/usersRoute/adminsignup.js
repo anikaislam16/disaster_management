@@ -1,11 +1,11 @@
-const db = require('../../db/db');
+const db = require("../../db/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 require("dotenv").config(); // Load environment variables from .env file
 
 const jwtSecret = process.env.JWT_SECRET;
 
-const signupUser = (req, res) => {
+const signupadmin = (req, res) => {
   const { name, age, phone, address, location, status, password } = req.body;
   console.log(req.body);
 
@@ -41,7 +41,7 @@ const signupUser = (req, res) => {
       }
 
       const sql =
-        "INSERT INTO users (name, age, phone, address, location, status, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO admin (name, age, phone, address, location, status, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
       db.query(
         sql,
         [name, age, phone, address, location, status, hashedPassword],
@@ -50,17 +50,14 @@ const signupUser = (req, res) => {
             console.error("Error inserting user data:", err);
             return res.status(500).json({ error: "Internal server error." });
           }
-          res.json({ message: "User signed up successfully!" });
+          res.json({ message: "admin signed up successfully!" });
         }
       );
     });
   });
 };
 
-
-
-
-const loginUser = (req, res) => {
+const loginadmin = (req, res) => {
   const { phone, password } = req.body;
 
   // Validate the input fields
@@ -69,7 +66,7 @@ const loginUser = (req, res) => {
   }
 
   // Check if user exists
-  const sql = "SELECT * FROM users WHERE phone = ?";
+  const sql = "SELECT * FROM admin WHERE phone = ?";
   db.query(sql, [phone], (err, results) => {
     if (err) {
       console.error("Error querying database:", err);
@@ -107,18 +104,17 @@ const loginUser = (req, res) => {
 };
 
 // Function to get users with status 'Approved'
-const getApprovedUsers = (req, res) => {
-  const sql = "SELECT name, age, phone, address, location FROM users WHERE status = 'Approved'";
+const getApprovedadmin = (req, res) => {
+  const sql =
+    "SELECT name, age, phone, address, location FROM admin WHERE status = 'Approved'";
 
   db.query(sql, (err, results) => {
     if (err) {
-      console.error("Error fetching approved users:", err);
+      console.error("Error fetching approved admin:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
     res.status(200).json(results); // Return the list of approved users
   });
 };
 
-
-
-module.exports = { signupUser, loginUser, getApprovedUsers };
+module.exports = { signupadmin, loginadmin, getApprovedadmin };

@@ -5,7 +5,8 @@ const cors = require("cors");
 
 
 const db = require("./db/db"); 
-const  userController  = require('./routes/usersRoute/userController');
+const userController = require('./routes/usersRoute/userController');
+const CrisisController = require('./routes/CrisisRoute/CrisisController');
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
   });
 });
 app.use('/users', userController);
+app.use('/crisis', CrisisController);
 // Start the server
 const PORT = 3010;
 app.listen(PORT, () => {
