@@ -128,7 +128,7 @@ const Navbar = () => {
                   isActive ? "text-white font-bold" : "text-white"
                 }
               >
-                Volunteer Management
+                Management
               </NavLink>
             </li>
           </ul>
@@ -138,7 +138,7 @@ const Navbar = () => {
         <div className="navbar-end flex justify-end gap-5">
           <div>
             <NavLink
-              to="/login/volunteer"
+              to="/login"
               className={({ isActive }) =>
                 isActive ? "text-blue btn" : "text-blue btn"
               }
@@ -148,12 +148,12 @@ const Navbar = () => {
           </div>
           <div>
             <NavLink
-              to="/management"
+              to="/adminLogin"
               className={({ isActive }) =>
                 isActive ? "text-blue btn" : "text-blue btn"
               }
             >
-              Admin Login
+              Admin Login/Registration
             </NavLink>
           </div>
         </div>

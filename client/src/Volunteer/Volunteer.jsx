@@ -4,7 +4,7 @@ import VolunteerList from "./VolunteerList";
 const Volunteer = () => {
   return (
     <div>
-      <VolunteerList />
+      <VolunteerList type="NotApproved" />
     </div>
   );
 };

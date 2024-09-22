@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import CrisisForm from "./CrisisForm";
 import CrisisInformation from "./CrisisInfrormations";
+import { UserContext } from "../context/UserProvider";
 
 const Crisis = () => {
+  const { user } = useContext(UserContext);
+
   return (
     <div className="mt-4">
-      <CrisisInformation />
+      <CrisisInformation type="notApproved" />
       <CrisisForm />
     </div>
   );

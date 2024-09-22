@@ -58,16 +58,20 @@ const signupadmin = (req, res) => {
 };
 
 const loginadmin = (req, res) => {
-  const { phone, password } = req.body;
+    const { phone, password } = req.body;
+    console.log(phone);
+    
 
   // Validate the input fields
   if (!phone || !password) {
     return res.status(400).send("Phone number and password are required.");
   }
-
+    let p = phone.split("+")[0];
+    console.log(p);
+    
   // Check if user exists
   const sql = "SELECT * FROM admin WHERE phone = ?";
-  db.query(sql, [phone], (err, results) => {
+  db.query(sql, [phone.split('+')[1]], (err, results) => {
     if (err) {
       console.error("Error querying database:", err);
       return res.status(500).send("Internal server error.");
@@ -91,14 +95,21 @@ const loginadmin = (req, res) => {
       }
 
       // Generate a JWT token
-      const token = jwt.sign(
-        { id: user.id, phone: user.phone },
-        jwtSecret,
-        { expiresIn: "1h" } // Token expiration time
-      );
+      const token = jwt.sign({ id: user.id, phone: user.phone }, jwtSecret, {
+        expiresIn: "1h",
+      });
 
-      // Send the token in the response
-      res.json({ token });
+      // Send token and user information in the response
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          phone: user.phone,
+          name: user.name,
+          location: user.location,
+          role: "admin",
+        },
+      });
     });
   });
 };

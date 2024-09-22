@@ -7,6 +7,8 @@ const cors = require("cors");
 const db = require("./db/db"); 
 const userController = require('./routes/usersRoute/userController');
 const CrisisController = require('./routes/CrisisRoute/CrisisController');
+const adminController = require('./routes/usersRoute/adminController');
+const donationController=require('./routes/donationRoute/donationController')
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,6 +25,8 @@ app.get("/", (req, res) => {
 });
 app.use('/users', userController);
 app.use('/crisis', CrisisController);
+app.use('/admins', adminController);
+app.use("/donation", donationController);
 // Start the server
 const PORT = 3010;
 app.listen(PORT, () => {

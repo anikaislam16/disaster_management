@@ -63,12 +63,10 @@ const signupUser = (req, res) => {
 const loginUser = (req, res) => {
   const { phone, password } = req.body;
 
-  // Validate the input fields
   if (!phone || !password) {
     return res.status(400).send("Phone number and password are required.");
   }
 
-  // Check if user exists
   const sql = "SELECT * FROM users WHERE phone = ?";
   db.query(sql, [phone], (err, results) => {
     if (err) {
@@ -82,7 +80,6 @@ const loginUser = (req, res) => {
 
     const user = results[0];
 
-    // Compare provided password with hashed password in database
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
         console.error("Error comparing passwords:", err);
@@ -93,22 +90,39 @@ const loginUser = (req, res) => {
         return res.status(401).send("Invalid password.");
       }
 
-      // Generate a JWT token
-      const token = jwt.sign(
-        { id: user.id, phone: user.phone },
-        jwtSecret,
-        { expiresIn: "1h" } // Token expiration time
-      );
+      const token = jwt.sign({ id: user.id, phone: user.phone }, jwtSecret, {
+        expiresIn: "1h",
+      });
 
-      // Send the token in the response
-      res.json({ token });
+      // Send token and user information in the response
+      res.json({
+        token,
+        user: { id: user.id, phone: user.phone, name: user.name ,location:user.location,role:"volunteer"},
+      });
     });
   });
 };
 
+
 // Function to get users with status 'Approved'
 const getApprovedUsers = (req, res) => {
-  const sql = "SELECT name, age, phone, address, location FROM users WHERE status = 'Approved'";
+  const sql = "SELECT id, name, age, phone, address, location, status FROM users WHERE status = 'Approved'";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching approved users:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+    res.status(200).json(results); // Return the list of approved users
+  });
+};
+const getUsers = (req, res) => {
+  const sql = `
+  SELECT id, name, age, phone, address, location ,status
+  FROM users 
+ 
+`;
+
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -120,5 +134,59 @@ const getApprovedUsers = (req, res) => {
 };
 
 
+const updateUser = (req, res) => {
+  const userId = req.params.userId;
+  const updates = req.body;
+console.log(userId);
 
-module.exports = { signupUser, loginUser, getApprovedUsers };
+  const fields = [];
+  const values = [];
+
+  // Check for status update (approval)
+  if (updates.status) {
+    if (["Approved", "Not Approved"].includes(updates.status)) {
+      fields.push("status = ?");
+      values.push(updates.status);
+    } else {
+      return res.status(400).json({ error: "Invalid status value." });
+    }
+  }
+
+  // Check for location update
+  if (updates.location) {
+    fields.push("location = ?");
+    values.push(updates.location);
+  }
+
+  // Ensure at least one field is being updated
+  if (fields.length === 0) {
+    return res.status(400).json({ error: "No fields to update." });
+  }
+
+  // Adding the userId to the values array
+  values.push(userId);
+
+  const sql = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
+
+  // Execute the update query
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error updating user:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json({ message: "User updated successfully!", result });
+  });
+};
+
+module.exports = {
+  signupUser,
+  loginUser,
+  getApprovedUsers,
+  getUsers,
+  updateUser
+};

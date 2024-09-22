@@ -1,23 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import CrisisModal from "./CrisisModal"; // Import the CrisisModal component
+import { UserContext } from "../context/UserProvider"; // Import the UserContext
 
-const CrisisInformation = () => {
+const CrisisInformation = ({ type }) => {
   const [crises, setCrises] = useState([]);
   const [filteredCrises, setFilteredCrises] = useState([]);
-  const [severityFilter, setSeverityFilter] = useState(""); // Empty means no filter
-  const [statusFilter, setStatusFilter] = useState(""); // Empty means no filter
+  const [severityFilter, setSeverityFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [selectedCrisis, setSelectedCrisis] = useState(null); // State for selected crisis
+  const [modalOpen, setModalOpen] = useState(false); // State for modal visibility
 
-  // Function to fetch approved crises from the backend
-  const fetchApprovedCrises = () => {
-    fetch(`${process.env.REACT_APP_API_URL}/crisis/approved`, {
+  const { user } = useContext(UserContext); // Access user info from context
+  const isAdmin = user && user.role === "admin"; // Check if user is admin
+  useEffect(() => {
+    console.log(user);
+  }, []);
+  const fetchCrisesByType = () => {
+    const apiUrl =
+      type === "Approved"
+        ? `${process.env.REACT_APP_API_URL}/crisis/approved`
+        : `${process.env.REACT_APP_API_URL}/crisis/not-approved`;
+
+    fetch(apiUrl, {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setCrises(data);
         setFilteredCrises(data);
       })
       .catch((error) => {
-        console.error("Error fetching approved crises:", error);
+        console.error("Error fetching crises:", error);
       });
   };
 
@@ -37,21 +51,59 @@ const CrisisInformation = () => {
     setFilteredCrises(filtered);
   };
 
+  const handleRowClick = (crisis) => {
+    setSelectedCrisis(crisis);
+    setModalOpen(true);
+  };
+
+  const handleApprove = (id) => {
+    const token = localStorage.getItem("token"); // Assuming you're storing the token in localStorage
+
+    fetch(`${process.env.REACT_APP_API_URL}/crisis/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Include the token in the headers
+      },
+      body: JSON.stringify({ isApproved: true }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          console.error("Error approving crisis:", data.error);
+          return;
+        }
+        console.log("Crisis approved:", data);
+        // Remove the approved crisis from the state
+        setCrises((prevCrises) =>
+          prevCrises.filter((crisis) => crisis.id !== id)
+        );
+        setFilteredCrises((prevFiltered) =>
+          prevFiltered.filter((crisis) => crisis.id !== id)
+        );
+      })
+      .catch((error) => {
+        console.error("Error approving crisis:", error);
+      });
+  };
+
   useEffect(() => {
-    fetchApprovedCrises();
-  }, []);
+    fetchCrisesByType(); // Fetch crises based on the prop type
+  }, [type]);
 
   useEffect(() => {
     filterCrises();
   }, [severityFilter, statusFilter, crises]);
 
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedCrisis(null);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Crisis Information</h2>
-
-      {/* Filter Options */}
       <div className="flex justify-start mb-4">
-        {/* Severity Filter */}
         <div className="mr-4">
           <label className="block text-gray-700 mb-2">Filter by Severity</label>
           <select
@@ -67,7 +119,6 @@ const CrisisInformation = () => {
           </select>
         </div>
 
-        {/* Status Filter */}
         <div>
           <label className="block text-gray-700 mb-2">Filter by Status</label>
           <select
@@ -95,6 +146,7 @@ const CrisisInformation = () => {
               <th>Status</th>
               <th>Date</th>
               <th>Location</th>
+              {type === "notApproved" && isAdmin && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -103,6 +155,7 @@ const CrisisInformation = () => {
                 <tr
                   key={crisis.id}
                   className={index % 2 === 0 ? "bg-base-200" : ""}
+                  onClick={() => handleRowClick(crisis)} // Handle row click
                 >
                   <th>{index + 1}</th>
                   <td>{crisis.name}</td>
@@ -110,11 +163,24 @@ const CrisisInformation = () => {
                   <td>{crisis.status}</td>
                   <td>{new Date(crisis.date).toLocaleString()}</td>
                   <td>{crisis.location}</td>
+                  {type === "notApproved" && isAdmin && (
+                    <td>
+                      <button
+                        className="btn btn-success"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent triggering the row click
+                          handleApprove(crisis.id);
+                        }}
+                      >
+                        Approve
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="7" className="text-center">
                   No crises found.
                 </td>
               </tr>
@@ -122,6 +188,11 @@ const CrisisInformation = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal for crisis details */}
+      {modalOpen && (
+        <CrisisModal crisis={selectedCrisis} onClose={closeModal} />
+      )}
     </div>
   );
 };

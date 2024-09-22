@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2"; // Import SweetAlert
+import React, { useState, useContext } from "react";
+import Swal from "sweetalert2";
+import { UserContext } from "../context/UserProvider";
 
 const SignInSignUpFormAdmin = () => {
   const [activeTab, setActiveTab] = useState("signin");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const { saveUser } = useContext(UserContext);
 
-  // New states for the signup form fields
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [age, setAge] = useState("");
@@ -39,8 +39,7 @@ const SignInSignUpFormAdmin = () => {
       return;
     }
 
-    // Make API call to login using Fetch API
-    fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
+    fetch(`${process.env.REACT_APP_API_URL}/admins/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,10 +64,12 @@ const SignInSignUpFormAdmin = () => {
           text: "You have successfully signed in!",
         });
 
-        // Optionally, save the JWT token in localStorage or cookies
+        // Store the token and user info in localStorage or context
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user)); // Store user info
 
-        // Redirect user or take additional actions
+        // Optionally, set user in context
+        saveUser(data.user);
       })
       .catch((error) => {
         Swal.fire({
@@ -98,7 +99,7 @@ const SignInSignUpFormAdmin = () => {
     }
 
     // Make API call to sign up using Fetch API
-    fetch(`${process.env.REACT_APP_API_URL}/users`, {
+    fetch(`${process.env.REACT_APP_API_URL}/admins`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +129,6 @@ const SignInSignUpFormAdmin = () => {
           text: "You have successfully signed up!",
         });
 
-        // Clear form fields after successful signup
         setName("");
         setAddress("");
         setAge("");

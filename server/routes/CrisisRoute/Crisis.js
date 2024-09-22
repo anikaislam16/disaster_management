@@ -1,35 +1,61 @@
 const db = require("../../db/db");
-
-
 const { v4: uuidv4 } = require("uuid"); // If you want to use UUIDs
 
 const addCrisis = (req, res) => {
-  const { id = uuidv4(), name, severity, date, location } = req.body;
+  const { name, severity, date, location, description } = req.body;
+  const pictures = req.files; // Handle uploaded files
 
   // Validate input
-  if (!name || !severity || !date || !location) {
+  if (!name || !severity || !date || !location || !description) {
     return res.status(400).json({ error: "All fields are required." });
   }
 
-  // Check for valid severity value
   const validSeverities = ["Low", "Moderate", "High", "Critical"];
   if (!validSeverities.includes(severity)) {
     return res.status(400).json({ error: "Invalid severity value." });
   }
 
-  // Prepare SQL query to insert the new crisis with ID and location
-  const sql =
-    "INSERT INTO crisis (id, name, severity, date, location) VALUES (?, ?, ?, ?, ?)";
-  db.query(sql, [id, name, severity, date, location], (err, result) => {
-    if (err) {
-      console.error("Error inserting crisis data:", err);
-      return res.status(500).json({ error: "Internal server error." });
+  const crisisId = uuidv4();
+  const crisisSql =
+    "INSERT INTO crisis (id, name, severity, date, location, description) VALUES (?, ?, ?, ?, ?, ?)";
+
+  db.query(
+    crisisSql,
+    [crisisId, name, severity, date, location, description],
+    (err) => {
+      if (err) {
+        console.error("Error inserting crisis data:", err);
+        return res.status(500).json({ error: "Internal server error." });
+      }
+
+      if (pictures && pictures.length > 0) {
+        const pictureInsertSql =
+          "INSERT INTO crisispictures (crisis_id, picture_data) VALUES ?";
+        const pictureValues = pictures.map((picture) => [
+          crisisId,
+          picture.buffer,
+        ]); // Use picture.buffer to store binary data
+
+        db.query(pictureInsertSql, [pictureValues], (err) => {
+          if (err) {
+            console.error("Error inserting crisis pictures:", err);
+            return res
+              .status(500)
+              .json({ error: "Failed to insert pictures." });
+          }
+          return res.status(201).json({
+            message: "Crisis and pictures added successfully!",
+            id: crisisId,
+          });
+        });
+      } else {
+        return res
+          .status(201)
+          .json({ message: "Crisis added successfully!", id: crisisId });
+      }
     }
-    res.status(201).json({ message: "Crisis added successfully!", id });
-  });
+  );
 };
-
-
 
 const updateCrisis = (req, res) => {
   const id = req.params.id;  
@@ -83,16 +109,109 @@ const updateCrisis = (req, res) => {
     res.json({ message: "Crisis updated successfully!", result });
   });
 };
-// Assuming "Approved" is the status for approved crises
-const getApprovedCrises = (req, res) => {
-  const sql = "SELECT * FROM crisis WHERE isApproved = '1' "; // Query to get approved crises
 
-  db.query(sql, (err, results) => {
+const getApprovedCrises = (req, res) => {
+  
+  const crisisSql = `
+    SELECT id, name, severity, status, date, location, description
+    FROM crisis
+    WHERE isApproved = '1'
+  `;
+
+  db.query(crisisSql, (err, crisisResults) => {
     if (err) {
       console.error("Error fetching approved crises:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    res.status(200).json(results); // Return the list of approved crises
+
+   
+    if (crisisResults.length === 0) {
+      return res.status(200).json([]);
+    }
+
+
+    const crisisIds = crisisResults.map((crisis) => crisis.id);
+
+    // Query to get pictures for the crises
+    const pictureSql = `
+      SELECT crisis_id, picture_data
+      FROM crisispictures
+      WHERE crisis_id IN (?)
+    `;
+
+    db.query(pictureSql, [crisisIds], (err, pictureResults) => {
+      if (err) {
+        console.error("Error fetching crisis pictures:", err);
+        return res.status(500).json({ error: "Internal server error." });
+      }
+
+   
+      const crises = crisisResults.map((crisis) => {
+        return {
+          ...crisis,
+          pictures: pictureResults
+            .filter((picture) => picture.crisis_id === crisis.id)
+            .map((picture) => ({
+              url: `data:image/jpeg;base64,${picture.picture_data.toString(
+                "base64"
+              )}`, 
+            })),
+        };
+      });
+
+      res.status(200).json(crises);
+    });
+  });
+};
+
+
+const getNotApprovedCrises = (req, res) => {
+  const crisisSql = `
+    SELECT id, name, severity, status, date, location, description
+    FROM crisis
+    WHERE isApproved = '0'
+  `;
+
+  db.query(crisisSql, (err, crisisResults) => {
+    if (err) {
+      console.error("Error fetching approved crises:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+
+    if (crisisResults.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const crisisIds = crisisResults.map((crisis) => crisis.id);
+
+    // Query to get pictures for the crises
+    const pictureSql = `
+      SELECT crisis_id, picture_data
+      FROM crisispictures
+      WHERE crisis_id IN (?)
+    `;
+
+    db.query(pictureSql, [crisisIds], (err, pictureResults) => {
+      if (err) {
+        console.error("Error fetching crisis pictures:", err);
+        return res.status(500).json({ error: "Internal server error." });
+      }
+
+      const crises = crisisResults.map((crisis) => {
+        return {
+          ...crisis,
+          pictures: pictureResults
+            .filter((picture) => picture.crisis_id === crisis.id)
+            .map((picture) => ({
+              url: `data:image/jpeg;base64,${picture.picture_data.toString(
+                "base64"
+              )}`,
+            })),
+        };
+      });
+
+      res.status(200).json(crises);
+    });
   });
 };
 
@@ -100,4 +219,9 @@ const getApprovedCrises = (req, res) => {
 
 
 
-module.exports = { addCrisis, updateCrisis, getApprovedCrises };
+module.exports = {
+  addCrisis,
+  updateCrisis,
+  getApprovedCrises,
+  getNotApprovedCrises,
+};
