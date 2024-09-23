@@ -63,9 +63,9 @@ const VolunteerList = ({ type }) => {
   };
 
   return (
-    <div>
+    <div className="">
       {/* Search and Filters */}
-      <div className="mb-4 flex space-x-4">
+      <div className="mt-14 ml-28 mb-4 flex space-x-4">
         <input
           type="text"
           placeholder="Search by name..."
@@ -110,7 +110,6 @@ const VolunteerList = ({ type }) => {
               <th>Address</th>
               <th>Location</th>
               <th>Status</th>
-              {user.role === "admin" && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -119,8 +118,8 @@ const VolunteerList = ({ type }) => {
                 <tr
                   key={user.phone}
                   className={index % 2 === 0 ? "bg-base-200" : ""}
-                  onClick={() => openModal(user)} // Open modal when row is clicked
-                  style={{ cursor: "pointer" }} // Show hand cursor on hover
+                  onClick={() => openModal(user)}
+                  style={{ cursor: "pointer" }}
                 >
                   <th>{index + 1}</th>
                   <td>{user.name}</td>
@@ -152,7 +151,7 @@ const VolunteerList = ({ type }) => {
       </div>
 
       {/* Render modal if open */}
-      {isModalOpen && (
+      {isModalOpen && user?.role === "admin" && (
         <EditUserModal
           user={selectedUser}
           closeModal={closeModal}

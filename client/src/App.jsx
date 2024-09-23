@@ -8,6 +8,8 @@ import Management from "./Admin_Management/Management";
 import SignInSignUpForm from "./Authentication/SignInSignUpForm";
 import { UserProvider } from "./context/UserProvider";
 import SignInSignUpFormAdmin from "./Authentication/SignInSignUpFormAdmin";
+import HomePage from "./Home/HomePage";
+import Inventory from "./Inventory/Inventory";
 function App() {
   return (
     <UserProvider>
@@ -15,6 +17,7 @@ function App() {
         <div className="App">
           <Navbar />
           <Routes>
+            <Route path="/" element={<HomePage />}></Route>
             <Route path="/login" element={<SignInSignUpForm />}></Route>
             <Route
               path="/adminLogin"
@@ -24,6 +27,7 @@ function App() {
             <Route path="/crisis" element={<Crisis />}></Route>
             <Route path="/volunteer" element={<Volunteer />}></Route>
             <Route path="/management" element={<Management />}></Route>
+            <Route path="/inventory" element={<Inventory />}></Route>
           </Routes>
         </div>
       </Router>

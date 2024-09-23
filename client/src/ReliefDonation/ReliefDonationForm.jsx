@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 
-const DonationForm = () => {
-  const [name, setName] = useState("");
+const ReliefDonationForm = () => {
+  const [type, setType] = useState("");
+  const [location, setLocation] = useState("");
   const [amount, setAmount] = useState("");
 
   // Handle form submission
@@ -10,22 +11,23 @@ const DonationForm = () => {
     e.preventDefault();
 
     // Validate form inputs
-    if (!amount || amount <= 0 || !Number.isInteger(Number(amount))) {
+    if (!type || !location) {
       Swal.fire({
         icon: "error",
-        title: "Invalid Amount",
-        text: "Please enter a valid positive integer for the amount.",
+        title: "Invalid Input",
+        text: "Please enter both type and location.",
       });
       return;
     }
 
     const donationData = {
-      name: name || "Anonymous",
-      amount: Number(amount),
+      type,
+      location,
+      amount,
     };
 
     // Send the data to the backend
-    fetch(`${process.env.REACT_APP_API_URL}/donation`, {
+    fetch(`${process.env.REACT_APP_API_URL}/relief`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,10 +46,11 @@ const DonationForm = () => {
           Swal.fire({
             icon: "success",
             title: "Donation Added",
-            text: "Thank you for your generous donation!",
+            text: "Thank you for your relief donation!",
           });
           // Clear the form fields
-          setName("");
+          setType("");
+          setLocation("");
           setAmount("");
         }
       })
@@ -63,27 +66,38 @@ const DonationForm = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Make a Donation</h2>
+      <h2 className="text-2xl font-bold ">Add New Relief goods</h2>
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Name (Optional)</label>
+          <label className="block text-gray-700 mb-2">Type</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={type}
+            onChange={(e) => setType(e.target.value)}
             className="input input-bordered w-full"
-            placeholder="Enter your name (or leave empty for anonymous)"
+            placeholder="Enter donation type (e.g., Food, Clothes)"
+            required
           />
         </div>
-
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Donation Amount</label>
+          <label className="block text-gray-700 mb-2">Amount</label>
           <input
-            type="number"
+            type="text"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             className="input input-bordered w-full"
-            placeholder="Enter donation amount"
+            placeholder="Enter relief amount"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">Location</label>
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="input input-bordered w-full"
+            placeholder="Enter donation location"
             required
           />
         </div>
@@ -96,4 +110,4 @@ const DonationForm = () => {
   );
 };
 
-export default DonationForm;
+export default ReliefDonationForm;

@@ -1,7 +1,7 @@
 const express = require("express");
-const authenticateJWT = require("../usersRoute/Authentication");
-const { insertDonation} = require("./donation");
+
+const { insertDonation, getDonationsByDate } = require("./donation");
 const router = express.Router();
 router.post("/", insertDonation);
-
+router.get("/", getDonationsByDate);
 module.exports = router;

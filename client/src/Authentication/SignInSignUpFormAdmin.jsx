@@ -1,19 +1,18 @@
 import React, { useState, useContext } from "react";
 import Swal from "sweetalert2";
 import { UserContext } from "../context/UserProvider";
-
+import { useNavigate } from "react-router-dom";
 const SignInSignUpFormAdmin = () => {
   const [activeTab, setActiveTab] = useState("signin");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const { saveUser } = useContext(UserContext);
-
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [age, setAge] = useState("");
   const [signupPhoneNumber, setSignupPhoneNumber] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
-
+  const navigate = useNavigate();
   const validatePhoneNumber = (phone) => {
     // Phone number should start with +880 and be followed by 11 digits (total 14 characters)
     const phoneRegex = /^\+880\d{10}$/;
@@ -64,12 +63,10 @@ const SignInSignUpFormAdmin = () => {
           text: "You have successfully signed in!",
         });
 
-        // Store the token and user info in localStorage or context
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user)); // Store user info
-
-        // Optionally, set user in context
+        localStorage.setItem("user", JSON.stringify(data.user));
         saveUser(data.user);
+        navigate("/");
       })
       .catch((error) => {
         Swal.fire({

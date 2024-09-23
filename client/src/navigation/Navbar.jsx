@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
-
+import { UserContext } from "../context/UserProvider";
 const Navbar = () => {
+  const { user } = useContext(UserContext);
   return (
     <div>
       <div className="navbar bg-blue-700 ">
@@ -131,6 +132,18 @@ const Navbar = () => {
                 Management
               </NavLink>
             </li>
+            {user && (
+              <li>
+                <NavLink
+                  to="/inventory"
+                  className={({ isActive }) =>
+                    isActive ? "text-white font-bold" : "text-white"
+                  }
+                >
+                  Inventory
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
 
