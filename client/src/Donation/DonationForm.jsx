@@ -5,11 +5,9 @@ const DonationForm = () => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate form inputs
     if (!amount || amount <= 0 || !Number.isInteger(Number(amount))) {
       Swal.fire({
         icon: "error",
@@ -24,7 +22,6 @@ const DonationForm = () => {
       amount: Number(amount),
     };
 
-    // Send the data to the backend
     fetch(`${process.env.REACT_APP_API_URL}/donation`, {
       method: "POST",
       headers: {
@@ -46,7 +43,7 @@ const DonationForm = () => {
             title: "Donation Added",
             text: "Thank you for your generous donation!",
           });
-          // Clear the form fields
+
           setName("");
           setAmount("");
         }

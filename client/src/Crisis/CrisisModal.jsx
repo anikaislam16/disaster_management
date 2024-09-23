@@ -1,7 +1,7 @@
 import React from "react";
 
 const CrisisModal = ({ crisis, onClose }) => {
-  if (!crisis) return null; // If no crisis is selected, return null
+  if (!crisis) return null;
 
   return (
     <div className="modal modal-open">
@@ -29,7 +29,7 @@ const CrisisModal = ({ crisis, onClose }) => {
             {crisis.pictures.map((picture, index) => (
               <div key={index} className="w-full h-auto">
                 <img
-                  src={picture.url} // Use the base64 image string directly
+                  src={picture.url}
                   className="object-cover w-full h-full rounded-md"
                   alt={`Crisis Image ${index + 1}`}
                 />

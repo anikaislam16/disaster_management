@@ -113,7 +113,7 @@ const getApprovedUsers = (req, res) => {
       console.error("Error fetching approved users:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    res.status(200).json(results); // Return the list of approved users
+    res.status(200).json(results);
   });
 };
 const getUsers = (req, res) => {
@@ -129,7 +129,7 @@ const getUsers = (req, res) => {
       console.error("Error fetching approved users:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    res.status(200).json(results); // Return the list of approved users
+    res.status(200).json(results); 
   });
 };
 
@@ -142,7 +142,7 @@ console.log(userId);
   const fields = [];
   const values = [];
 
-  // Check for status update (approval)
+ 
   if (updates.status) {
     if (["Approved", "Not Approved"].includes(updates.status)) {
       fields.push("status = ?");
@@ -152,7 +152,7 @@ console.log(userId);
     }
   }
 
-  // Check for location update
+ 
   if (updates.location) {
     fields.push("location = ?");
     values.push(updates.location);
@@ -163,12 +163,11 @@ console.log(userId);
     return res.status(400).json({ error: "No fields to update." });
   }
 
-  // Adding the userId to the values array
   values.push(userId);
 
   const sql = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
 
-  // Execute the update query
+
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error updating user:", err);

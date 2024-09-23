@@ -1,11 +1,10 @@
 const db = require("../../db/db");
-const { v4: uuidv4 } = require("uuid"); // If you want to use UUIDs
+const { v4: uuidv4 } = require("uuid"); 
 
 const addCrisis = (req, res) => {
   const { name, severity, date, location, description } = req.body;
-  const pictures = req.files; // Handle uploaded files
-
-  // Validate input
+  const pictures = req.files; 
+  
   if (!name || !severity || !date || !location || !description) {
     return res.status(400).json({ error: "All fields are required." });
   }
@@ -34,7 +33,7 @@ const addCrisis = (req, res) => {
         const pictureValues = pictures.map((picture) => [
           crisisId,
           picture.buffer,
-        ]); // Use picture.buffer to store binary data
+        ]);  
 
         db.query(pictureInsertSql, [pictureValues], (err) => {
           if (err) {
@@ -64,7 +63,7 @@ const updateCrisis = (req, res) => {
   const fields = [];
   const values = [];
 
-  // Check for severity update
+ 
   if (updates.severity) {
     if (["Low", "Moderate", "High", "Critical"].includes(updates.severity)) {
       fields.push("severity = ?");
@@ -74,7 +73,7 @@ const updateCrisis = (req, res) => {
     }
   }
 
-  // Check for status update
+
   if (updates.status) {
     if (["Pending", "Ongoing", "Resolved", "Closed"].includes(updates.status)) {
       fields.push("status = ?");
@@ -84,23 +83,23 @@ const updateCrisis = (req, res) => {
     }
   }
 
-  // Check for isApproved update
+
   if (typeof updates.isApproved === "boolean") {
     fields.push("isApproved = ?");
     values.push(updates.isApproved);
   }
 
-  // Ensure at least one field is being updated
+
   if (fields.length === 0) {
     return res.status(400).json({ error: "No fields to update." });
   }
 
-  // Adding the ID to the values array
+
   values.push(id);
 
   const sql = `UPDATE crisis SET ${fields.join(", ")} WHERE id = ?`;
 
-  // Execute the update query
+
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error updating crisis:", err);
@@ -115,7 +114,7 @@ const getApprovedCrises = (req, res) => {
   const crisisSql = `
     SELECT id, name, severity, status, date, location, description
     FROM crisis
-    WHERE isApproved = '1'
+    WHERE isApproved = '1' order by date
   `;
 
   db.query(crisisSql, (err, crisisResults) => {
@@ -132,7 +131,7 @@ const getApprovedCrises = (req, res) => {
 
     const crisisIds = crisisResults.map((crisis) => crisis.id);
 
-    // Query to get pictures for the crises
+
     const pictureSql = `
       SELECT crisis_id, picture_data
       FROM crisispictures
@@ -169,7 +168,7 @@ const getNotApprovedCrises = (req, res) => {
   const crisisSql = `
     SELECT id, name, severity, status, date, location, description
     FROM crisis
-    WHERE isApproved = '0'
+    WHERE isApproved = '0' order by date
   `;
 
   db.query(crisisSql, (err, crisisResults) => {
@@ -184,7 +183,7 @@ const getNotApprovedCrises = (req, res) => {
 
     const crisisIds = crisisResults.map((crisis) => crisis.id);
 
-    // Query to get pictures for the crises
+    
     const pictureSql = `
       SELECT crisis_id, picture_data
       FROM crisispictures

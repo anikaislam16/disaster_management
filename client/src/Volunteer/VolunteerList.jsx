@@ -63,8 +63,10 @@ const VolunteerList = ({ type }) => {
   };
 
   return (
-    <div className="">
-      {/* Search and Filters */}
+    <div className="mx-28">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        Volunteer's Information
+      </h2>
       <div className="mt-14 ml-28 mb-4 flex space-x-4">
         <input
           type="text"

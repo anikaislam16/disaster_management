@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
 
   const clearUser = () => {
     setUser(null);
-    localStorage.removeItem("user"); // Remove from localStorage
+    localStorage.removeItem("user");
   };
 
   return (

@@ -7,7 +7,7 @@ const SignInSignUpForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const { saveUser } = useContext(UserContext);
-  // New states for the signup form fields
+
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [age, setAge] = useState("");
@@ -97,7 +97,6 @@ const SignInSignUpForm = () => {
       return;
     }
 
-    // Make API call to sign up using Fetch API
     fetch(`${process.env.REACT_APP_API_URL}/users`, {
       method: "POST",
       headers: {
@@ -128,7 +127,6 @@ const SignInSignUpForm = () => {
           text: "You have successfully signed up!",
         });
 
-        // Clear form fields after successful signup
         setName("");
         setAddress("");
         setAge("");
@@ -181,6 +179,9 @@ const SignInSignUpForm = () => {
 
         {activeTab === "signup" && (
           <div>
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Volunteer Sign Up
+            </h2>
             <input
               type="text"
               placeholder="Name"

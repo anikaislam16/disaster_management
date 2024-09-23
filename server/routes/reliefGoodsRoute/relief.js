@@ -7,7 +7,7 @@ const insertDonation = (req, res) => {
     return res.status(400).json({ error: "Type, amount and location are required." });
   }
 
-  const id = uuidv4(); // Generate a unique ID for each donation
+  const id = uuidv4();  
   const query = `INSERT INTO reliefDonation (id, type, location, amount) VALUES (?, ?, ?,?)`;
 
   db.query(query, [id, type, location,amount], (err, result) => {
@@ -35,29 +35,28 @@ const updateReliefDonation = (req, res) => {
   const fields = [];
   const values = [];
 
-  // Check for type update
+  
   if (updates.type) {
     fields.push("type = ?");
     values.push(updates.type);
   }
-  // Check for amount update
+ 
   if (updates.amount) {
     fields.push("amount = ?");
       values.push(updates.amount);
     
   }
 
-  // Check for date update (formatting the date for MySQL)
   if (updates.date) {
     const date = new Date(updates.date)
       .toISOString()
       .slice(0, 19)
-      .replace("T", " "); // Formats to 'YYYY-MM-DD HH:MM:SS'
+      .replace("T", " "); 
     fields.push("date = ?");
     values.push(date);
   }
 
-  // Check for location update
+  
   if (updates.location) {
     fields.push("location = ?");
     values.push(updates.location);
@@ -88,7 +87,7 @@ const deleteReliefDonation = (req, res) => {
 
   const sql = `DELETE FROM reliefDonation WHERE id = ?`;
 
-  // Execute the delete query
+
   db.query(sql, [donationId], (err, result) => {
     if (err) {
       console.error("Error deleting donation:", err);

@@ -24,7 +24,7 @@ const insertDonation = (req, res) => {
 const getDonationsByDate = (req, res) => {
   const { startDate, endDate } = req.query;
 
-  // Ensure startDate and endDate are provided
+
   if (!startDate || !endDate) {
     return res
       .status(400)
@@ -33,12 +33,11 @@ const getDonationsByDate = (req, res) => {
 
   console.log("Querying donations from:", startDate, "to", endDate);
 
-  // Query to get donations within the date range
    const query = `SELECT * FROM donationMoney WHERE DATE(date) BETWEEN ? AND ?`;
 
   db.query(query, [startDate, endDate], (err, results) => {
     if (err) {
-      console.error("Error executing query:", err); // Log the error
+      console.error("Error executing query:", err); 
       return res.status(500).json({ error: "Error retrieving donations" });
     }
 
@@ -46,17 +45,30 @@ const getDonationsByDate = (req, res) => {
       console.log("No donations found for the given date range.");
     }
 
-    // Calculate total amount
+    
     const totalAmount = results.reduce((acc, curr) => acc + curr.amount, 0);
 
     console.log("Donations found:", results);
     console.log("Total amount:", totalAmount);
 
-    // Send response with donations and total amount
+    
     return res.json({ donations: results, totalAmount });
   });
 };
 
 
+const getTotalDonations = (req, res) => {
+  const query = `SELECT SUM(amount) AS total_donations FROM donationMoney`;
 
-module.exports = { insertDonation, getDonationsByDate };
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error("Error fetching total donations:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+    
+    const total = result[0]?.total_donations || 0; 
+    res.json({ total_donations: total });
+  });
+};
+
+module.exports = { insertDonation, getDonationsByDate, getTotalDonations };

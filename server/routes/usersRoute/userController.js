@@ -9,7 +9,7 @@ const {
 const authenticateJWT = require("../usersRoute/Authentication");
 const router = express.Router();
 
-// Route for signup
+
 router.post("/", signupUser);
 router.post("/login", loginUser);
 router.get("/approved", getApprovedUsers);

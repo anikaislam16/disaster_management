@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useContext } from "react";
-import CrisisModal from "./CrisisModal"; // Import the CrisisModal component
-import { UserContext } from "../context/UserProvider"; // Import the UserContext
+import CrisisModal from "./CrisisModal";
+import { UserContext } from "../context/UserProvider";
 
 const CrisisInformation = ({ type }) => {
   const [crises, setCrises] = useState([]);
   const [filteredCrises, setFilteredCrises] = useState([]);
   const [severityFilter, setSeverityFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedCrisis, setSelectedCrisis] = useState(null); // State for selected crisis
-  const [modalOpen, setModalOpen] = useState(false); // State for modal visibility
+  const [selectedCrisis, setSelectedCrisis] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const { user } = useContext(UserContext); // Access user info from context
-  const isAdmin = user && user.role === "admin"; // Check if user is admin
+  const { user } = useContext(UserContext);
+  const isAdmin = user && user.role === "admin";
   useEffect(() => {
     console.log(user);
   }, []);
@@ -57,7 +57,7 @@ const CrisisInformation = ({ type }) => {
   };
 
   const handleApprove = (id) => {
-    const token = localStorage.getItem("token"); // Assuming you're storing the token in localStorage
+    const token = localStorage.getItem("token");
 
     fetch(`${process.env.REACT_APP_API_URL}/crisis/${id}`, {
       method: "PUT",
@@ -71,10 +71,10 @@ const CrisisInformation = ({ type }) => {
       .then((data) => {
         if (data.error) {
           console.error("Error approving crisis:", data.error);
-          return;
+          return; //
         }
         console.log("Crisis approved:", data);
-        // Remove the approved crisis from the state
+
         setCrises((prevCrises) =>
           prevCrises.filter((crisis) => crisis.id !== id)
         );
@@ -155,7 +155,7 @@ const CrisisInformation = ({ type }) => {
                 <tr
                   key={crisis.id}
                   className={index % 2 === 0 ? "bg-base-200" : ""}
-                  onClick={() => handleRowClick(crisis)} // Handle row click
+                  onClick={() => handleRowClick(crisis)}
                 >
                   <th>{index + 1}</th>
                   <td>{crisis.name}</td>

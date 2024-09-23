@@ -1,25 +1,25 @@
 const db = require("../../db/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config(); 
 
 const jwtSecret = process.env.JWT_SECRET;
 
 const signupadmin = (req, res) => {
-  const { name, age, phone, address, location, status, password } = req.body;
-  console.log(req.body);
-
-  if (
-    !name ||
-    !age ||
-    !phone ||
-    !address ||
-    !location ||
-    !status ||
-    !password
-  ) {
-    return res.status(400).json({ error: "All fields are required." });
-  }
+  const { name, age, phone, address, location, status, password, secretKey } = req.body;
+ 
+  if (process.env.SECRET_KEY != secretKey)return res.status(400).json({ error: "No match for admin key" });
+    if (
+      !name ||
+      !age ||
+      !phone ||
+      !address ||
+      !location ||
+      !status ||
+      !password
+    ) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
 
   const checkPhoneQuery = "SELECT * FROM users WHERE phone = ?";
   db.query(checkPhoneQuery, [phone], (err, results) => {
@@ -62,14 +62,14 @@ const loginadmin = (req, res) => {
     console.log(phone);
     
 
-  // Validate the input fields
+ 
   if (!phone || !password) {
     return res.status(400).send("Phone number and password are required.");
   }
     let p = phone.split("+")[0];
     console.log(p);
     
-  // Check if user exists
+
   const sql = "SELECT * FROM admin WHERE phone = ?";
   db.query(sql, [phone.split('+')[1]], (err, results) => {
     if (err) {
@@ -83,7 +83,7 @@ const loginadmin = (req, res) => {
 
     const user = results[0];
 
-    // Compare provided password with hashed password in database
+  
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
         console.error("Error comparing passwords:", err);
@@ -94,12 +94,12 @@ const loginadmin = (req, res) => {
         return res.status(401).send("Invalid password.");
       }
 
-      // Generate a JWT token
+     
       const token = jwt.sign({ id: user.id, phone: user.phone }, jwtSecret, {
         expiresIn: "1h",
       });
 
-      // Send token and user information in the response
+ 
       res.json({
         token,
         user: {
@@ -114,7 +114,7 @@ const loginadmin = (req, res) => {
   });
 };
 
-// Function to get users with status 'Approved'
+
 const getApprovedadmin = (req, res) => {
   const sql =
     "SELECT name, age, phone, address, location FROM admin WHERE status = 'Approved'";
@@ -124,7 +124,7 @@ const getApprovedadmin = (req, res) => {
       console.error("Error fetching approved admin:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    res.status(200).json(results); // Return the list of approved users
+    res.status(200).json(results); 
   });
 };
 

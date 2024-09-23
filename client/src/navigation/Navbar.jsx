@@ -1,8 +1,16 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { UserContext } from "../context/UserProvider";
+
 const Navbar = () => {
-  const { user } = useContext(UserContext);
+  const { user, clearUser } = useContext(UserContext);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    clearUser();
+    window.location.href = "/login";
+  };
+
   return (
     <div>
       <div className="navbar bg-blue-700 ">
@@ -132,7 +140,7 @@ const Navbar = () => {
                 Management
               </NavLink>
             </li>
-            {user && (
+            {user && (user.role === "admin" || user.role === "volunteer") && (
               <li>
                 <NavLink
                   to="/inventory"
@@ -149,26 +157,30 @@ const Navbar = () => {
 
         {/* Navbar End */}
         <div className="navbar-end flex justify-end gap-5">
-          <div>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive ? "text-blue btn" : "text-blue btn"
-              }
-            >
-              Login/Register
-            </NavLink>
-          </div>
-          <div>
-            <NavLink
-              to="/adminLogin"
-              className={({ isActive }) =>
-                isActive ? "text-blue btn" : "text-blue btn"
-              }
-            >
-              Admin Login/Registration
-            </NavLink>
-          </div>
+          {user && (user.role === "admin" || user.role === "volunteer") ? (
+            <button onClick={handleLogout} className="text-blue btn">
+              Logout
+            </button>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  isActive ? "text-blue btn" : "text-blue btn"
+                }
+              >
+                Login/Register
+              </NavLink>
+              <NavLink
+                to="/adminLogin"
+                className={({ isActive }) =>
+                  isActive ? "text-blue btn" : "text-blue btn"
+                }
+              >
+                Admin Login/Registration
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </div>

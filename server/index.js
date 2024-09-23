@@ -10,6 +10,8 @@ const CrisisController = require('./routes/CrisisRoute/CrisisController');
 const adminController = require('./routes/usersRoute/adminController');
 const donationController = require('./routes/donationRoute/donationController');
 const reliefController = require('./routes/reliefGoodsRoute/reliefController');
+const purchaseController = require('./routes/purchaseRoute/purchaseController');
+const reportController = require('./routes/reports/roportController');
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,6 +31,9 @@ app.use('/crisis', CrisisController);
 app.use('/admins', adminController);
 app.use("/donation", donationController);
 app.use("/relief", reliefController);
+app.use("/purchase", purchaseController);
+app.use("/report", reportController);
+
 // Start the server
 const PORT = 3010;
 app.listen(PORT, () => {

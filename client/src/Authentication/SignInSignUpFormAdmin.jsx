@@ -6,6 +6,7 @@ const SignInSignUpFormAdmin = () => {
   const [activeTab, setActiveTab] = useState("signin");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [key, setKey] = useState("");
   const { saveUser } = useContext(UserContext);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -95,7 +96,6 @@ const SignInSignUpFormAdmin = () => {
       return;
     }
 
-    // Make API call to sign up using Fetch API
     fetch(`${process.env.REACT_APP_API_URL}/admins`, {
       method: "POST",
       headers: {
@@ -109,6 +109,7 @@ const SignInSignUpFormAdmin = () => {
         location: "Not Set",
         status: "Not Approved",
         password: signupPassword,
+        secretKey: key,
       }),
     })
       .then((response) => {
@@ -178,6 +179,9 @@ const SignInSignUpFormAdmin = () => {
 
         {activeTab === "signup" && (
           <div>
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Admin Sign Up
+            </h2>
             <input
               type="text"
               placeholder="Name"
@@ -211,6 +215,13 @@ const SignInSignUpFormAdmin = () => {
               placeholder="Password"
               value={signupPassword}
               onChange={(e) => setSignupPassword(e.target.value)}
+              className="input input-bordered w-full mb-3"
+            />
+            <input
+              type="password"
+              placeholder="Key"
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
               className="input input-bordered w-full mb-3"
             />
             <button

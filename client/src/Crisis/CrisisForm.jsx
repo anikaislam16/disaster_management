@@ -7,20 +7,18 @@ const CrisisForm = () => {
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const [pictures, setPictures] = useState([]); // Pictures state with file objects
-  const [progress, setProgress] = useState({}); // Track upload progress
-  const fileInputRef = React.createRef(); // Ref for the file input
+  const [pictures, setPictures] = useState([]);
+
+  const fileInputRef = React.createRef();
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const newFiles = files.map((file) => ({
       file,
-      preview: URL.createObjectURL(file), // Create preview for the file
-      percent: 0, // Start with 0% progress
+      preview: URL.createObjectURL(file),
+      percent: 0,
     }));
-    setPictures((prev) => [...prev, ...newFiles]); // Add new files to the list
-
-    // Clear the file input after selecting
+    setPictures((prev) => [...prev, ...newFiles]);
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
     }
@@ -33,7 +31,6 @@ const CrisisForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate form fields
     if (!name || !severity || !date || !location || !description) {
       Swal.fire({
         icon: "error",
@@ -50,25 +47,14 @@ const CrisisForm = () => {
     formData.append("location", location);
     formData.append("description", description);
 
-    // Append files to FormData
     pictures.forEach((fileObj, index) => {
       formData.append("pictures", fileObj.file);
     });
 
-    // Simulate progress tracking for each file (can be integrated with real upload API)
     pictures.forEach((fileObj, index) => {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          const newPercent = (prev[fileObj.file.name] || 0) + 10;
-          if (newPercent >= 100) {
-            clearInterval(interval);
-          }
-          return { ...prev, [fileObj.file.name]: newPercent };
-        });
-      }, 100);
+      const interval = setInterval(() => {}, 100);
     });
 
-    // API call for form submission
     fetch(`${process.env.REACT_APP_API_URL}/crisis`, {
       method: "POST",
       body: formData,
@@ -88,16 +74,15 @@ const CrisisForm = () => {
             text: "Crisis added successfully!",
           });
 
-          // Clear all form fields after submission
           setName("");
           setSeverity("Low");
           setDate("");
           setLocation("");
           setDescription("");
           setPictures([]);
-          setProgress({}); // Reset progress
+
           if (fileInputRef.current) {
-            fileInputRef.current.value = null; // Reset the file input
+            fileInputRef.current.value = null;
           }
         }
       })
@@ -178,11 +163,11 @@ const CrisisForm = () => {
           <input
             type="file"
             multiple
-            ref={fileInputRef} // Bind the input to the ref
+            ref={fileInputRef}
             onChange={handleFileChange}
             className="file-input file-input-bordered w-full"
           />
-          {/* Display selected files */}
+
           <div className="mt-4">
             {pictures.map((fileObj, index) => (
               <div
