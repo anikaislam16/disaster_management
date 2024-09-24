@@ -18,6 +18,9 @@ to install all the libraries- npm i
 --> Command for starting client:
 npm start
 
+secret_key for admin registration: admin123@123
+
+
 Necessary Database tables:
 CREATE TABLE admin (
     id INT AUTO_INCREMENT PRIMARY KEY,
